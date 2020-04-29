@@ -1,4 +1,4 @@
-# Person movement + coronas; No timer
+# Person movement + coronas + shooting 1 at a time; No timer
 ## Coronavirus Fight
 
 import pygame
