@@ -55,7 +55,7 @@ class Player(pygame.sprite.Sprite):  # represents the Nurse/player, not the game
         # blit yourself at your current position
         screen.blit(player, (self.x, self.y))
         self.phitbox = (self.x +10, self.y +14, 62, 230)
-        pygame.draw.rect(screen, (255, 0, 0,), self.phitbox, 2)
+        #pygame.draw.rect(screen, (255, 0, 0,), self.phitbox, 2)
 
 
 # Shoot sanitizer
@@ -63,15 +63,15 @@ class Sanitizer(pygame.sprite.Sprite): #shoots to the left
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
         self.image = tizer
-        self.x = x
+        self.x = x + 20
         self.y = y +60
-        self.vel = 8
+        self.vel = 5
         self.sanit_hitbox = (self.x, self.y, 25, 35)
 
     def sanitdraw(self, screen):
         screen.blit(tizer, (self.x, self.y))
         self.sanit_hitbox = (self.x, self.y, 25, 35)
-        pygame.draw.rect(screen, (255, 0, 0), self.sanit_hitbox, 2)
+        #pygame.draw.rect(screen, (255, 0, 0), self.sanit_hitbox, 2)
 
 
 # Right going Left Coronas
@@ -137,6 +137,7 @@ def main():
     enemies = []
     enemiesleft = []
     sanits = []
+    leftsanits = []
     wave_length = 1
     playerimage = Player(width / 2, height / 2 - 20)
     clock = pygame.time.Clock()
@@ -163,6 +164,8 @@ def main():
         # draw sanits
         for sanit in sanits:
             sanit.sanitdraw(screen)
+        for leftsanit in leftsanits:
+            leftsanit.sanitdraw(screen)
 
         pygame.display.update()
 
@@ -177,6 +180,8 @@ def main():
         leftrona.drawleft(screen)
         sanit = Sanitizer(playerimage.phitbox[0],playerimage.phitbox[1]+50)
         sanit.sanitdraw(screen)
+        leftsanit = Sanitizer(playerimage.phitbox[0],playerimage.phitbox[1]+50)
+        leftsanit.sanitdraw(screen)
 
         for enemy in enemies:
             enemy.move()
@@ -197,28 +202,82 @@ def main():
                                         random.randint(10, 500))  # instance of Coronavirus class
                 enemiesleft.append(rona3)
 
-        # Virus Collision
+        # Virus Collisions
         for enemy in enemies:  # hitboxes: x,y,width,height
-            if enemy.hitbox[1] + enemy.hitbox[3] > playerimage.phitbox[1]:
-                if enemy.hitbox[0] + enemy.hitbox[2] > playerimage.phitbox[0]:
+            if enemy.hitbox[1] + enemy.hitbox[3] > playerimage.phitbox[1] and enemy.hitbox[1]<playerimage.phitbox[1]: #Hit on top
+                if enemy.hitbox[0] + enemy.hitbox[2] > playerimage.phitbox[0] and enemy.hitbox[0] + enemy.hitbox[2] < playerimage.phitbox[0] + playerimage.phitbox[2]:
                     enemy.hit()
                     lives = lives - 1
+            if enemy.hitbox[1] + enemy.hitbox[3] < playerimage.phitbox[1] + playerimage.phitbox[3] and enemy.hitbox[1] > playerimage.phitbox[1]: # Can't pass through player
+                if enemy.hitbox[0] + enemy.hitbox[2] > playerimage.phitbox[0] and enemy.hitbox[0] + enemy.hitbox[2] < playerimage.phitbox[0] + playerimage.phitbox[2]:
+                    enemy.hit()
+                    lives = lives - 1
+            if enemy.hitbox[1] + enemy.hitbox[3] > playerimage.phitbox[1] + playerimage.phitbox[3] and enemy.hitbox[1] < playerimage.phitbox[1]+ playerimage.phitbox[3]: #Hit on Bottom
+                if enemy.hitbox[0] + enemy.hitbox[2] > playerimage.phitbox[0] and enemy.hitbox[0] + enemy.hitbox[2] < playerimage.phitbox[0] + playerimage.phitbox[2]:
+                    enemy.hit()
+                    lives = lives - 1
+
         for leftenemy in enemiesleft:  # hitboxes: x,y,width,height
-            if leftenemy.hitboxleft[1] + leftenemy.hitboxleft[3] > playerimage.phitbox[1]:
-                if leftenemy.hitboxleft[0] < playerimage.phitbox[0] + playerimage.phitbox[2]:
+            if leftenemy.hitboxleft[1] + leftenemy.hitboxleft[3] > playerimage.phitbox[1] and leftenemy.hitboxleft[1]<playerimage.phitbox[1]: #Hit on Top
+                if leftenemy.hitboxleft[0] < playerimage.phitbox[0] + playerimage.phitbox[2] and leftenemy.hitboxleft[0] + leftenemy.hitboxleft[2]> playerimage.phitbox[0]+ playerimage.phitbox[2]:
+                    leftenemy.hitleft()
+                    lives = lives - 1
+            if leftenemy.hitboxleft[1] + leftenemy.hitboxleft[3] < playerimage.phitbox[1] +playerimage.phitbox[3] and leftenemy.hitboxleft[1]>playerimage.phitbox[1]:  # Can't pass through player
+                if leftenemy.hitboxleft[0] < playerimage.phitbox[0] + playerimage.phitbox[2] and leftenemy.hitboxleft[0] + leftenemy.hitboxleft[2]> playerimage.phitbox[0]+ playerimage.phitbox[2]:
+                    leftenemy.hitleft()
+                    lives = lives - 1
+            if leftenemy.hitboxleft[1] < playerimage.phitbox[1] +playerimage.phitbox[3] and leftenemy.hitboxleft[1]+ leftenemy.hitboxleft[3]>playerimage.phitbox[1]+playerimage.phitbox[3]:  # Can't pass through player
+                if leftenemy.hitboxleft[0] < playerimage.phitbox[0] + playerimage.phitbox[2] and leftenemy.hitboxleft[0] + leftenemy.hitboxleft[2]> playerimage.phitbox[0]+ playerimage.phitbox[2]:
                     leftenemy.hitleft()
                     lives = lives - 1
 
         # Shoot Sanitizers
-        for sanit in sanits:
-            if sanit.x > 0:
+        for sanit in sanits: #to the left
+            if sanit.x > -5:
                 sanit.x -= sanit.vel
             else:
                 sanits.pop(sanits.index(sanit))
+        for leftsanit in leftsanits:
+            if leftsanit.x < width+5: #to the right
+                leftsanit.x += leftsanit.vel
+            else:
+                leftsanits.pop(leftsanits.index(leftsanit))
         key = pygame.key.get_pressed()
         if key[pygame.K_z]:
-            if len(sanits) < 5: #can't exceed this number shots on screen at one time
-                sanits.append(Sanitizer(600,550))
+            if len(sanits) < 1: #can't exceed this number shots on screen at one time
+                sanits.append(sanit)
+        if key[pygame.K_c]:
+            if len(leftsanits) < 1:  # can't exceed this number shots on screen at one time
+                leftsanits.append(leftsanit)
+
+        # Sanitizer Shot Coronavirus Hits
+        for enemy in enemies:  # hitboxes: x,y,width,height
+            if enemy.hitbox[1] + enemy.hitbox[3] > sanit.sanit_hitbox[1] and enemy.hitbox[1]<sanit.sanit_hitbox[1]: #Hit on top
+                if enemy.hitbox[0] + enemy.hitbox[2] > sanit.sanit_hitbox[0] and enemy.hitbox[0] + enemy.hitbox[2] < sanit.sanit_hitbox[0] + sanit.sanit_hitbox[2]:
+                    enemy.hit()
+                    score = score + 1
+            if enemy.hitbox[1] + enemy.hitbox[3] < sanit.sanit_hitbox[1] + sanit.sanit_hitbox[3] and enemy.hitbox[1] > sanit.sanit_hitbox[1]: # Can't pass through player
+                if enemy.hitbox[0] + enemy.hitbox[2] > sanit.sanit_hitbox[0] and enemy.hitbox[0] + enemy.hitbox[2] < sanit.sanit_hitbox[0] + sanit.sanit_hitbox[2]:
+                    enemy.hit()
+                    score = score + 1
+            if enemy.hitbox[1] + enemy.hitbox[3] > sanit.sanit_hitbox[1] + sanit.sanit_hitbox[3] and enemy.hitbox[1] < sanit.sanit_hitbox[1]+ sanit.sanit_hitbox[3]: #Hit on Bottom
+                if enemy.hitbox[0] + enemy.hitbox[2] > sanit.sanit_hitbox[0] and enemy.hitbox[0] + enemy.hitbox[2] < sanit.sanit_hitbox[0] + sanit.sanit_hitbox[2]:
+                    enemy.hit()
+                    score = score + 1
+        #to the right
+        for leftenemy in enemiesleft:  # hitboxes: x,y,width,height
+            if leftenemy.hitboxleft[1] + leftenemy.hitboxleft[3] > leftsanit.sanit_hitbox[1] and leftenemy.hitboxleft[1]<leftsanit.sanit_hitbox[1]: #Hit on Top
+                if leftenemy.hitboxleft[0] < leftsanit.sanit_hitbox[0] + leftsanit.sanit_hitbox[2] and leftenemy.hitboxleft[0] + leftenemy.hitboxleft[2]> leftsanit.sanit_hitbox[0]+ leftsanit.sanit_hitbox[2]:
+                    leftenemy.hitleft()
+                    score = score + 1
+            if leftenemy.hitboxleft[1] + leftenemy.hitboxleft[3] < leftsanit.sanit_hitbox[1] +leftsanit.sanit_hitbox[3] and leftenemy.hitboxleft[1]>leftsanit.sanit_hitbox[1]:  # Can't pass through player
+                if leftenemy.hitboxleft[0] < leftsanit.sanit_hitbox[0] + leftsanit.sanit_hitbox[2] and leftenemy.hitboxleft[0] + leftenemy.hitboxleft[2]> leftsanit.sanit_hitbox[0]+ leftsanit.sanit_hitbox[2]:
+                    leftenemy.hitleft()
+                    score = score + 1
+            if leftenemy.hitboxleft[1] < leftsanit.sanit_hitbox[1] +leftsanit.sanit_hitbox[3] and leftenemy.hitboxleft[1]+ leftenemy.hitboxleft[3]>leftsanit.sanit_hitbox[1]+leftsanit.sanit_hitbox[3]:  # Can't pass through player
+                if leftenemy.hitboxleft[0] < leftsanit.sanit_hitbox[0] + leftsanit.sanit_hitbox[2] and leftenemy.hitboxleft[0] + leftenemy.hitboxleft[2]> leftsanit.sanit_hitbox[0]+ leftsanit.sanit_hitbox[2]:
+                    leftenemy.hitleft()
+                    score = score + 1
 
         redraw_window()
 
