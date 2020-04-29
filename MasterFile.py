@@ -1,4 +1,5 @@
-# Coronavirus Fight
+# Person movement + coronas; No timer
+## Coronavirus Fight
 
 import pygame
 import os
@@ -17,13 +18,17 @@ pygame.display.set_caption("Rona Rambo")
 background = pygame.image.load("background.png")
 background = pygame.transform.scale(background, (width, height))
 player = pygame.image.load("mdoctor.png")
+player = pygame.transform.scale(player, (80, 250))
 virus = pygame.image.load("rona.png")
 virus = pygame.transform.scale(virus, (100, 75))
 coin = pygame.image.load("coin.png")
 coin = pygame.transform.scale(coin, (100, 75))
+tizer = pygame.image.load("sanitizer.png")
+tizer = pygame.transform.scale(tizer, (25, 35))
+
 
 # Player Class
-class Player(pygame.sprite.Sprite):
+class Player(pygame.sprite.Sprite):  # represents the Nurse/player, not the game
     def __init__(self, x, y):
         """ The constructor of the class """
         pygame.sprite.Sprite.__init__(self)
@@ -31,28 +36,43 @@ class Player(pygame.sprite.Sprite):
         # the nurse's position
         self.x = x
         self.y = y
-        self.phitbox = (width / 2 +10, height / 2 -5,90, 340)
+        self.phitbox = (self.x +10, self.y +14, 62, 230)
 
     def handle_keys(self):
         """ Handles Keys """
         key = pygame.key.get_pressed()
         dist = 4
-        #if key[pygame.K_DOWN]: # down key
-            #self.y += dist # move down
-        #elif key[pygame.K_UP]: # up key
-            #self.y -= dist # move up
-        if key[pygame.K_RIGHT]: # right key
-            self.x = self.x + dist # move right
-        elif key[pygame.K_LEFT]: # left key
-            self.x = self.x - dist # move left
+        if key[pygame.K_DOWN] or key[pygame.K_s]:  # down key
+            self.y += dist  # move down
+        elif key[pygame.K_UP] or key[pygame.K_w]:  # up key
+            self.y -= dist  # move up
+        if key[pygame.K_RIGHT] or key[pygame.K_d]:  # right key
+            self.x = self.x + dist  # move right
+        elif key[pygame.K_LEFT] or key[pygame.K_a]:  # left key
+            self.x = self.x - dist  # move left
 
     def draw(self, screen):
         # blit yourself at your current position
         screen.blit(player, (self.x, self.y))
-        self.phitbox = (self.x +10, self.y +17,90, 340)
-        #pygame.draw.rect(screen, (255, 0, 0,), self.phitbox, 2)
+        self.phitbox = (self.x +10, self.y +14, 62, 230)
+        pygame.draw.rect(screen, (255, 0, 0,), self.phitbox, 2)
 
-#
+
+# Shoot sanitizer
+class Sanitizer(pygame.sprite.Sprite): #shoots to the left
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = tizer
+        self.x = x
+        self.y = y +60
+        self.vel = 8
+        self.sanit_hitbox = (self.x, self.y, 25, 35)
+
+    def sanitdraw(self, screen):
+        screen.blit(tizer, (self.x, self.y))
+        self.sanit_hitbox = (self.x, self.y, 25, 35)
+        pygame.draw.rect(screen, (255, 0, 0), self.sanit_hitbox, 2)
+
 
 # Right going Left Coronas
 class Coronavirus(pygame.sprite.Sprite):
@@ -62,12 +82,12 @@ class Coronavirus(pygame.sprite.Sprite):
         self.x = x
         self.y = y
         self.health = health
-        self.hitbox = (self.x +5, self.y, 90, 75)
+        self.hitbox = (self.x + 5, self.y, 90, 75)
 
     def draw(self, screen):
         screen.blit(virus, (self.x, self.y))
-        self.hitbox = (self.x +5, self.y,90, 75)
-        #pygame.draw.rect(screen,(255,0,0),self.hitbox,2)
+        self.hitbox = (self.x + 5, self.y, 90, 75)
+        # pygame.draw.rect(screen,(255,0,0),self.hitbox,2)
 
     def move(self):
         self.x = self.x + 2.5
@@ -88,12 +108,12 @@ class LeftCoronavirus(pygame.sprite.Sprite):
         self.x = x
         self.y = y
         self.health = health
-        self.hitboxleft = (self.x +5, self.y, 90, 75)
+        self.hitboxleft = (self.x + 5, self.y, 90, 75)
 
     def drawleft(self, screen):
         screen.blit(virus, (self.x, self.y))
-        self.hitboxleft = (self.x +5, self.y,90, 75)
-        #pygame.draw.rect(screen,(255,0,0),self.hitboxleft,2)
+        self.hitboxleft = (self.x + 5, self.y, 90, 75)
+        # pygame.draw.rect(screen,(255,0,0),self.hitboxleft,2)
 
     def moveleft(self):
         self.x = self.x - 2.5
@@ -116,6 +136,7 @@ def main():
     lost_font = pygame.font.SysFont("comicsans", 80)
     enemies = []
     enemiesleft = []
+    sanits = []
     wave_length = 1
     playerimage = Player(width / 2, height / 2 - 20)
     clock = pygame.time.Clock()
@@ -131,32 +152,38 @@ def main():
         screen.blit(lives_label, (1030, 10))
         if lives <= 0:
             lost_label = lost_font.render("You lost!", 1, (255, 255, 255))
-            screen.blit(lost_label, (width/2.3, height/2))
+            screen.blit(lost_label, (width / 2.3, height / 2))
 
-
+        # draw ronas
         for rona in enemies:
             rona.draw(screen)
         for ronaleft in enemiesleft:
             ronaleft.drawleft(screen)
 
+        # draw sanits
+        for sanit in sanits:
+            sanit.sanitdraw(screen)
+
         pygame.display.update()
 
     while running:
-        #while loop setup
+        # while loop setup
         clock.tick(FPS)
-        redraw_window()
         rona = Coronavirus(0, 100)
         rona.draw(screen)
         playerimage.handle_keys()
         playerimage.draw(screen)
         leftrona = LeftCoronavirus(width, 100)
         leftrona.drawleft(screen)
+        sanit = Sanitizer(playerimage.phitbox[0],playerimage.phitbox[1]+50)
+        sanit.sanitdraw(screen)
+
         for enemy in enemies:
             enemy.move()
         for leftenemy in enemiesleft:
             leftenemy.moveleft()
 
-        #Generate additional viruses
+        # Generate additional viruses
         if len(enemies) == 0:
             wave_length += 2
             for i in range(wave_length):
@@ -170,19 +197,33 @@ def main():
                                         random.randint(10, 500))  # instance of Coronavirus class
                 enemiesleft.append(rona3)
 
-        #Virus Collision
-        for enemy in enemies: #hitboxes: x,y,width,height
+        # Virus Collision
+        for enemy in enemies:  # hitboxes: x,y,width,height
             if enemy.hitbox[1] + enemy.hitbox[3] > playerimage.phitbox[1]:
                 if enemy.hitbox[0] + enemy.hitbox[2] > playerimage.phitbox[0]:
                     enemy.hit()
                     lives = lives - 1
-        for leftenemy in enemiesleft: #hitboxes: x,y,width,height
+        for leftenemy in enemiesleft:  # hitboxes: x,y,width,height
             if leftenemy.hitboxleft[1] + leftenemy.hitboxleft[3] > playerimage.phitbox[1]:
                 if leftenemy.hitboxleft[0] < playerimage.phitbox[0] + playerimage.phitbox[2]:
                     leftenemy.hitleft()
                     lives = lives - 1
 
-        #To exit game screen
+        # Shoot Sanitizers
+        for sanit in sanits:
+            if sanit.x > 0:
+                sanit.x -= sanit.vel
+            else:
+                sanits.pop(sanits.index(sanit))
+        key = pygame.key.get_pressed()
+        if key[pygame.K_z]:
+            if len(sanits) < 5: #can't exceed this number shots on screen at one time
+                sanits.append(Sanitizer(600,550))
+
+        redraw_window()
+
+
+        # To exit game screen
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
