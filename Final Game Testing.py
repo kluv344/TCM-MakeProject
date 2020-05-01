@@ -33,11 +33,13 @@ virus = pygame.image.load("rona.png")
 virus = pygame.transform.scale(virus, (100, 75))
 tizer = pygame.image.load("sanitizer.png")
 tizer = pygame.transform.scale(tizer, (25, 35))
+
 #Load Music
 music = pygame.mixer.music.load('UpbeatFunk.wav')
 pygame.mixer.music.play(-1)
 punchSound = pygame.mixer.Sound('Thwack.wav')
 
+#Load Start Screen
 def surface_and_text(text, font_size, text_color, background_color):
     font = pygame.freetype.SysFont("comicsans", font_size, bold = True)
     surface, _ = font.render(text = text, fgcolor = text_color, bgcolor = background_color)
@@ -344,7 +346,7 @@ def main():
         if pygame.time.get_ticks() >= 90000:
             lost_label = lost_font.render(f"You lost! Score: {score} ", 1, RED)
             screen.blit(lost_label, (width/2-200, height/2-100))
-            goback_main = main_font.render("Press Space to Return to Main Menu", 1, BLACK)
+            goback_main = main_font.render("Press Space to Return to Main Menu", 1, WHITE)
             screen.blit(goback_main, (width/2-300, height/2-20))
             keys = pygame.key.get_pressed()
             if key[pygame.K_SPACE]:
