@@ -135,6 +135,10 @@ def game_loop(screen, buttons):
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 mouse_up = True
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
         screen.fill(BLUE)
         title_font = pygame.font.SysFont("freesansbold", 120)
         instructions_font = pygame.font.SysFont("comicsans", 30)
