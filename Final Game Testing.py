@@ -1,4 +1,3 @@
-# Person movement + coronas; No timer
 ## Coronavirus Fight
 import sys
 import pygame
@@ -32,8 +31,6 @@ player = pygame.image.load("maledoc2.png")
 player = pygame.transform.scale(player, (80, 250))
 virus = pygame.image.load("rona.png")
 virus = pygame.transform.scale(virus, (100, 75))
-coin = pygame.image.load("coin.png")
-coin = pygame.transform.scale(coin, (100, 75))
 tizer = pygame.image.load("sanitizer.png")
 tizer = pygame.transform.scale(tizer, (25, 35))
 #Load Music
@@ -98,8 +95,6 @@ class ChangingButtons(Sprite):
 
 
 def state_changes():
-    pygame.init()
-
     screen = pygame.display.set_mode((width, height))
     game_state = GameState.TITLE
 
@@ -327,7 +322,7 @@ def main():
             sanit.sanitdraw(screen)
         for leftsanit in leftsanits:
             leftsanit.sanitdraw(screen)
-
+        #End Game
         if lives <= 0:
             lost_label = lost_font.render(f"You lost! Score: {score} ", 1, RED)
             screen.blit(lost_label, (width/2-200, height/2-100))
@@ -336,6 +331,7 @@ def main():
             keys = pygame.key.get_pressed()
             if key[pygame.K_SPACE]:
                 title_screen(screen)
+                state_changes()
             elif key[pygame.K_SPACE]:
                 pygame.quit()
             # print("trigger title screen from no lives")
@@ -349,6 +345,7 @@ def main():
             keys = pygame.key.get_pressed()
             if key[pygame.K_SPACE]:
                 title_screen(screen)
+                state_changes()
             elif key[pygame.K_SPACE]:
                 pygame.quit()
 
@@ -511,11 +508,12 @@ def main():
 
         redraw_window(minutes,seconds)
 
-
         # To exit game screen
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+                pygame.quit()
+                sys.exit()
 
 state_changes()
 main()
