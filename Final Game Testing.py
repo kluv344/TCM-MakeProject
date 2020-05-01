@@ -330,7 +330,7 @@ def main():
         if lives <= 0:
             lost_label = lost_font.render(f"You lost! Score: {score} ", 1, RED)
             screen.blit(lost_label, (width/2-200, height/2-100))
-            goback_main = main_font.render("Press Space to Return to Main Menu", 1, BLACK)
+            goback_main = main_font.render("Press Space to Return to Main Menu", 1, WHITE)
             screen.blit(goback_main, (width/2-300, height/2-20))
             keys = pygame.key.get_pressed()
             if key[pygame.K_SPACE]:
